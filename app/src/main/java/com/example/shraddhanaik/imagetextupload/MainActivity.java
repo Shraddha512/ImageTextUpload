@@ -1,0 +1,123 @@
+package com.example.shraddhanaik.imagetextupload;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Base64;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+
+
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private Button buttonChoose;
+    private Button buttonUpload;
+    private Button buttonCapture;
+
+    private EditText editText;
+    private ImageView imageView;
+
+    private int PICK_IMAGE_REQUEST = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        buttonUpload = (Button) findViewById(R.id.buttonUpload);
+        buttonChoose = (Button) findViewById(R.id.buttonChoose);
+        buttonCapture = (Button) findViewById(R.id.buttonCapture);
+
+        editText = (EditText) findViewById(R.id.editText);
+        imageView = (ImageView) findViewById(R.id.imageView);
+
+        buttonChoose.setOnClickListener(this);
+        buttonUpload.setOnClickListener(this);
+        buttonCapture.setOnClickListener(this);
+    }
+
+    private void showFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+
+    }
+
+    private void displayContent(){
+        
+    }
+
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK ) {
+
+            Uri filePath = data.getData();
+            System.out.println(filePath);
+
+
+            try {
+                Bitmap imgBitmap = (Bitmap) MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                System.out.println(imgBitmap);
+                imageView.setImageBitmap(imgBitmap);
+
+            } catch (IOException e) {
+                System.out.println("hi");
+                e.printStackTrace();
+            }
+        }
+        else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                imageView.setImageBitmap(imageBitmap);
+        }
+    }
+
+
+
+    @Override
+    public void onClick(View v) {
+        if(v == buttonChoose){
+            showFileChooser();
+        }
+        if(v == buttonCapture){
+            dispatchTakePictureIntent();
+        }
+
+        if(v == buttonUpload){
+
+            displayContent();
+        }
+    }
+
+}
