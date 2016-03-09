@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView imageView;
 
     private int PICK_IMAGE_REQUEST = 1;
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private int REQUEST_IMAGE_CAPTURE = 2;
 
 
 
@@ -65,13 +65,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void displayContent(){
-        
+
+        Intent intent = new Intent(this,Display.class);
+
     }
 
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
@@ -80,23 +83,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK ) {
 
             Uri filePath = data.getData();
-            System.out.println(filePath);
+
 
 
             try {
                 Bitmap imgBitmap = (Bitmap) MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                System.out.println(imgBitmap);
                 imageView.setImageBitmap(imgBitmap);
 
             } catch (IOException e) {
-                System.out.println("hi");
                 e.printStackTrace();
             }
         }
-        else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        System.out.println("Before if block");
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
                 imageView.setImageBitmap(imageBitmap);
